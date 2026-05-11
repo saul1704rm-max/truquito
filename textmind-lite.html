@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TextMind Lite</title>
+  <style>
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap");
+:root {
+  --bg: #08080e;
+  --surface: #101018;
+  --surface-2: #171720;
+  --surface-3: #20202d;
+  --line: #2b2b3d;
+  --line-2: #3a3a50;
+  --text: #eeeeF8;
+  --soft: #aaaac2;
+  --muted: #71718c;
+  --purple: #7c6dfa;
+  --teal: #67e8c4;
+  --pink: #f26d98;
+  --bee: #f3c742;
+  --orange: #f39a44;
+  --red: #ff5576;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(760px 460px at 8% 0%, rgba(124, 109, 250, .13), transparent 62%),
+    radial-gradient(720px 420px at 98% 90%, rgba(103, 232, 196, .08), transparent 64%),
+    linear-gradient(180deg, #090910, #07070c);
+  color: var(--text);
+  font-family: "Syne", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 18px 0 72px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 240px;
+}
+
+.brand-mark,
+.bee-logo {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--purple), var(--teal));
+  color: #07070c;
+  font-weight: 900;
+  box-shadow: 0 0 28px rgba(124, 109, 250, .24);
+}
+
+.brand-name {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-name span {
+  color: var(--teal);
+}
+
+.brand-sub,
+.bee-sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.tab-btn,
+.ghost-btn,
+.chip,
+.mode-btn,
+.preset-btn,
+.primary-btn {
+  border-radius: var(--radius-sm);
+  transition: background .18s, border-color .18s, color .18s, opacity .18s, transform .18s;
+}
+
+.tab-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--soft);
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tab-btn:hover,
+.ghost-btn:hover,
+.chip:hover,
+.mode-btn:hover,
+.preset-btn:hover {
+  border-color: var(--line-2);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #06110e;
+}
+
+.tab-btn.bee.active {
+  background: var(--bee);
+  border-color: var(--bee);
+  color: #171207;
+}
+
+.status-bar,
+.config-panel,
+.model-bar,
+.panel,
+.chat-panel,
+.tracker {
+  background: rgba(16, 16, 24, .75);
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(16px);
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+  padding: 10px 12px;
+}
+
+.provider-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(23, 23, 32, .72);
+  color: var(--soft);
+  font: 10px "DM Mono", monospace;
+}
+
+.provider-pill b {
+  color: var(--text);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.status-dot.ok {
+  background: var(--teal);
+  box-shadow: 0 0 8px rgba(103, 232, 196, .75);
+}
+
+.status-dot.partial {
+  background: var(--bee);
+}
+
+.status-dot.err {
+  background: var(--red);
+}
+
+.request-count {
+  margin-left: auto;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+
+.request-count b {
+  color: var(--teal);
+}
+
+.ghost-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--soft);
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ghost-btn.compact {
+  padding: 5px 9px;
+  font-size: 10px;
+}
+
+.ghost-btn.danger:hover {
+  border-color: rgba(255, 85, 118, .45);
+  color: #ff9aaf;
+}
+
+.primary-btn {
+  border: 0;
+  color: white;
+  background: linear-gradient(135deg, var(--purple), #5d52df);
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.primary-btn.teal {
+  color: #06110e;
+  background: linear-gradient(135deg, var(--teal), #33d6a0);
+}
+
+.primary-btn.bee {
+  color: #171207;
+  background: linear-gradient(135deg, var(--bee), #d5a60e);
+}
+
+.primary-btn.full,
+.ghost-btn.full {
+  width: 100%;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.config-panel {
+  display: none;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.config-panel.open {
+  display: block;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  background: rgba(23, 23, 32, .58);
+}
+
+.panel-title {
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.head-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pin {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--purple);
+}
+
+.pin.purple { background: var(--purple); }
+.pin.teal { background: var(--teal); }
+.pin.pink { background: var(--pink); }
+.pin.orange { background: var(--orange); }
+.pin.bee { background: var(--bee); }
+
+.key-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 14px;
+}
+
+.key-card {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.key-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.key-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.mini-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.mini-dot.ok { background: var(--teal); }
+.mini-dot.err { background: var(--red); }
+
+.key-input,
+.select,
+.custom-model,
+.textarea,
+.chat-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #080810;
+  color: var(--text);
+  outline: none;
+}
+
+.key-input {
+  padding: 8px 9px;
+  font: 11px "DM Mono", monospace;
+}
+
+.key-input:focus,
+.select:focus,
+.custom-model:focus,
+.textarea:focus,
+.chat-input:focus {
+  border-color: var(--purple);
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+  animation: fadeUp .25s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.model-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.chip,
+.mode-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  padding: 6px 10px;
+  font: 10px "DM Mono", monospace;
+  font-weight: 800;
+}
+
+.chip.active,
+.mode-btn.active {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: white;
+}
+
+.select {
+  min-width: 260px;
+  flex: 1;
+  padding: 9px 10px;
+  font: 11px "DM Mono", monospace;
+}
+
+.custom-model {
+  width: 230px;
+  padding: 9px 10px;
+  font: 11px "DM Mono", monospace;
+}
+
+.model-info {
+  flex-basis: 100%;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 8, 16, .55);
+  color: var(--muted);
+  padding: 8px 10px;
+  font: 10px "DM Mono", monospace;
+  line-height: 1.55;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 305px;
+  gap: 14px;
+  align-items: start;
+}
+
+.side-stack,
+.main-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chat-panel {
+  height: 660px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-panel.dragover {
+  border-color: rgba(103, 232, 196, .52);
+  box-shadow: 0 0 0 1px rgba(103, 232, 196, .15), 0 18px 46px rgba(0, 0, 0, .22);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 16px;
+}
+
+.empty-state {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  color: var(--muted);
+  font: 12px "DM Mono", monospace;
+}
+
+.empty-state strong {
+  color: var(--soft);
+  font: 700 15px "Syne", sans-serif;
+}
+
+.msg {
+  display: flex;
+  gap: 10px;
+  max-width: 100%;
+  animation: fadeUp .18s ease;
+}
+
+.msg.user {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface-3);
+  color: var(--soft);
+  font: 10px "DM Mono", monospace;
+  font-weight: 900;
+}
+
+.msg.user .avatar {
+  border-color: rgba(242, 109, 152, .44);
+}
+
+.msg.assistant .avatar {
+  border-color: rgba(103, 232, 196, .44);
+}
+
+.bubble {
+  max-width: calc(100% - 42px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.msg.user .bubble {
+  background: rgba(124, 109, 250, .10);
+  border-color: rgba(124, 109, 250, .28);
+}
+
+.bubble p + p {
+  margin-top: 8px;
+}
+
+.bubble pre {
+  margin: 8px 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #090912;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  font: 11px/1.55 "DM Mono", monospace;
+}
+
+.bubble img,
+.preview img {
+  display: block;
+}
+
+.bubble img {
+  max-width: min(100%, 360px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.meta-line {
+  margin-top: 7px;
+  color: var(--muted);
+  font: 9px "DM Mono", monospace;
+}
+
+.composer {
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 12px;
+}
+
+.preview-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.preview {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview button {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .72);
+  color: white;
+  font-size: 11px;
+}
+
+.composer-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.chat-input {
+  min-height: 46px;
+  max-height: 130px;
+  resize: none;
+  padding: 11px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 9px;
+}
+
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hint {
+  margin-left: auto;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+
+.panel {
+  overflow: hidden;
+}
+
+.panel-body {
+  padding: 12px;
+}
+
+.textarea {
+  min-height: 155px;
+  resize: vertical;
+  padding: 12px;
+  line-height: 1.62;
+  font-size: 13px;
+}
+
+.textarea.small {
+  min-height: 118px;
+}
+
+.textarea.question {
+  min-height: 126px;
+}
+
+.mono {
+  color: var(--soft);
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+}
+
+.preset-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.preset-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--soft);
+  padding: 9px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+
+.stats b {
+  color: var(--text);
+}
+
+.bee-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(243, 199, 66, .25);
+  border-radius: var(--radius);
+  background: rgba(243, 199, 66, .08);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.bee-logo {
+  background: linear-gradient(135deg, var(--bee), #e09f26);
+  color: #171207;
+}
+
+.bee-title {
+  color: var(--bee);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.mini-stats {
+  display: flex;
+  gap: 16px;
+  padding-top: 9px;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+
+.mini-stats b {
+  color: var(--teal);
+}
+
+.answer {
+  min-height: 116px;
+  max-height: 430px;
+  overflow-y: auto;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.78;
+}
+
+.answer p + p {
+  margin-top: 8px;
+}
+
+.placeholder {
+  color: var(--muted);
+  font: italic 12px "DM Mono", monospace;
+}
+
+.tracker {
+  padding: 14px;
+}
+
+.tracker-title {
+  color: var(--bee);
+  font: 10px "DM Mono", monospace;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dot-step {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  font: 11px "DM Mono", monospace;
+  font-weight: 900;
+}
+
+.dot-step.current {
+  background: var(--bee);
+  border-color: var(--bee);
+  color: #171207;
+}
+
+.dot-step.done {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #06110e;
+}
+
+.history {
+  max-height: 370px;
+  overflow-y: auto;
+}
+
+.history-item {
+  border-top: 1px solid var(--line);
+  padding: 10px 12px;
+  color: var(--soft);
+  font-size: 12px;
+}
+
+.history-item:first-child {
+  border-top: 0;
+}
+
+.history-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font: 9px "DM Mono", monospace;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font: 11px "DM Mono", monospace;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--line-2);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-box {
+  border: 1px solid rgba(255, 85, 118, .28);
+  background: rgba(255, 85, 118, .08);
+  color: #ff9aae;
+  border-radius: var(--radius-sm);
+  padding: 10px 11px;
+  font: 11px/1.6 "DM Mono", monospace;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tabs {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .tab-btn {
+    flex: 1;
+  }
+
+  .request-count {
+    margin-left: 0;
+  }
+
+  .workspace,
+  .key-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-panel {
+    min-height: 560px;
+    height: 72vh;
+  }
+
+  .select,
+  .custom-model {
+    min-width: 100%;
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">TM</div>
+        <div>
+          <div class="brand-name">Text<span>Mind</span></div>
+          <div class="brand-sub">Chat + BeeReaders</div>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="Vistas">
+        <button class="tab-btn active" data-view="chat" type="button">Chat</button>
+        <button class="tab-btn bee" data-view="bee" type="button">BeeReaders</button>
+      </nav>
+    </header>
+
+    <section class="status-bar">
+      <div class="provider-pill">
+        <span class="status-dot" id="dot-groq"></span>
+        <span>Groq</span>
+        <b id="count-groq">0/3</b>
+      </div>
+      <div class="provider-pill">
+        <span class="status-dot" id="dot-google"></span>
+        <span>Google AI</span>
+        <b id="count-google">0/3</b>
+      </div>
+      <div class="provider-pill">
+        <span class="status-dot" id="dot-openrouter"></span>
+        <span>OpenRouter</span>
+        <b id="count-openrouter">0/3</b>
+      </div>
+      <div class="request-count">Req: <b id="requestCount">0</b></div>
+      <button class="ghost-btn" id="toggleConfig" type="button">APIs</button>
+    </section>
+
+    <section class="config-panel" id="configPanel" aria-label="Configuracion de APIs">
+      <div class="panel-head">
+        <span class="pin purple"></span>
+        <span class="panel-title">API Keys</span>
+        <div class="head-actions">
+          <button class="ghost-btn compact" id="importKeysBtn" type="button">Importar</button>
+          <button class="ghost-btn compact" id="exportKeysBtn" type="button">Exportar</button>
+          <button class="ghost-btn compact danger" id="clearKeysBtn" type="button">Borrar</button>
+        </div>
+      </div>
+      <div class="key-grid" id="keyGrid"></div>
+      <input type="file" id="importKeysInput" accept="application/json" hidden />
+    </section>
+
+    <main class="view active" id="view-chat">
+      <section class="model-bar">
+        <div class="chips" data-owner="chat">
+          <button class="chip active" data-filter="auto" type="button">Todos</button>
+          <button class="chip" data-filter="groq" type="button">Groq</button>
+          <button class="chip" data-filter="google" type="button">Google</button>
+          <button class="chip" data-filter="openrouter" type="button">OpenRouter</button>
+          <button class="chip" data-filter="vision" type="button">Vision</button>
+        </div>
+        <select class="select" id="chatModel"></select>
+        <input class="custom-model" id="chatCustomModel" placeholder="modelo personalizado opcional" />
+        <button class="ghost-btn compact" id="refreshModelsChat" type="button">Actualizar gratis</button>
+        <div class="model-info" id="chatModelInfo">Solo modelos gratis.</div>
+      </section>
+
+      <div class="workspace">
+        <section class="chat-panel" id="chatDropZone">
+          <div class="messages" id="chatMessages">
+            <div class="empty-state">
+              <strong>Nuevo chat</strong>
+              <span>Listo.</span>
+            </div>
+          </div>
+
+          <div class="composer">
+            <div class="preview-row" id="imagePreviews"></div>
+            <div class="composer-row">
+              <textarea id="chatInput" class="chat-input" rows="1" placeholder="Escribe tu mensaje"></textarea>
+              <button class="primary-btn teal" id="sendChatBtn" type="button">Enviar</button>
+            </div>
+            <div class="composer-actions">
+              <label class="ghost-btn file-btn">
+                Imagen
+                <input id="imageInput" type="file" accept="image/*" multiple hidden />
+              </label>
+              <button class="ghost-btn" id="clearChatBtn" type="button">Limpiar</button>
+              <button class="ghost-btn" id="exportChatBtn" type="button">Guardar chat</button>
+              <span class="hint" id="chatHint"></span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin teal"></span>
+              <span class="panel-title">System prompt</span>
+              <button class="ghost-btn compact" id="resetSystemBtn" type="button">Reset</button>
+            </div>
+            <div class="panel-body">
+              <textarea id="systemPrompt" class="textarea mono small">Eres un asistente preciso, util y claro. Responde en espanol.</textarea>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin pink"></span>
+              <span class="panel-title">Presets</span>
+            </div>
+            <div class="preset-list">
+              <button class="preset-btn" data-preset="tutor" type="button">Tutor</button>
+              <button class="preset-btn" data-preset="codigo" type="button">Codigo</button>
+              <button class="preset-btn" data-preset="resumen" type="button">Resumen</button>
+              <button class="preset-btn" data-preset="vision" type="button">Vision</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin orange"></span>
+              <span class="panel-title">Estado</span>
+            </div>
+            <div class="stats">
+              <div>Mensajes <b id="statMessages">0</b></div>
+              <div>Imagenes <b id="statImages">0</b></div>
+              <div>Modelo <b id="statModel">-</b></div>
+              <div>Fallback <b id="statFallback">auto</b></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <main class="view" id="view-bee">
+      <section class="bee-banner">
+        <div class="bee-logo">BR</div>
+        <div>
+          <div class="bee-title">BeeReaders</div>
+          <div class="bee-sub">4 preguntas por desafio</div>
+        </div>
+      </section>
+
+      <section class="model-bar">
+        <div class="chips" data-owner="bee">
+          <button class="chip active" data-filter="auto" type="button">Todos</button>
+          <button class="chip" data-filter="groq" type="button">Groq</button>
+          <button class="chip" data-filter="google" type="button">Google</button>
+          <button class="chip" data-filter="openrouter" type="button">OpenRouter</button>
+        </div>
+        <select class="select" id="beeModel"></select>
+        <input class="custom-model" id="beeCustomModel" placeholder="modelo personalizado opcional" />
+        <button class="ghost-btn compact" id="refreshModelsBee" type="button">Actualizar gratis</button>
+        <div class="model-info" id="beeModelInfo">Solo modelos gratis.</div>
+      </section>
+
+      <div class="workspace">
+        <section class="main-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin bee"></span>
+              <span class="panel-title">Texto</span>
+              <button class="ghost-btn compact" id="clearBeeTextBtn" type="button">Limpiar</button>
+            </div>
+            <div class="panel-body">
+              <textarea id="beeText" class="textarea" placeholder="Pega el texto del desafio"></textarea>
+              <div class="mini-stats">
+                <span>Palabras <b id="beeWords">0</b></span>
+                <span>Chars <b id="beeChars">0</b></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin bee"></span>
+              <span class="panel-title" id="beeQuestionTitle">Pregunta 1</span>
+            </div>
+            <div class="panel-body">
+              <textarea id="beeQuestion" class="textarea question" placeholder="Pega la pregunta con sus opciones"></textarea>
+              <div class="composer-actions">
+                <button class="mode-btn active" data-mode="fast" type="button">Rapido</button>
+                <button class="mode-btn" data-mode="explain" type="button">Explicar</button>
+                <button class="primary-btn bee" id="submitBeeBtn" type="button">Responder</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin bee"></span>
+              <span class="panel-title">Respuesta</span>
+              <button class="ghost-btn compact" id="copyBeeBtn" type="button" hidden>Copiar</button>
+            </div>
+            <div class="answer" id="beeAnswer">
+              <p class="placeholder">La respuesta aparecera aqui...</p>
+            </div>
+          </section>
+        </section>
+
+        <aside class="side-stack">
+          <section class="tracker">
+            <div class="tracker-title">Desafio actual</div>
+            <div class="dots" id="beeDots"></div>
+            <div class="stats">
+              <div>Progreso <b id="beeProgress">0/4</b></div>
+              <div>Modelo <b id="beeUsedModel">-</b></div>
+              <button class="primary-btn bee full" id="saveBeeBtn" type="button" hidden>Guardar</button>
+              <button class="ghost-btn full" id="resetBeeBtn" type="button">Reiniciar</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span class="pin teal"></span>
+              <span class="panel-title">Historial</span>
+              <button class="ghost-btn compact danger" id="clearBeeHistoryBtn" type="button">Borrar</button>
+            </div>
+            <div class="history" id="beeHistory"></div>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+const PROVIDERS = ["groq", "google", "openrouter"];
+
+const PROVIDER_LABELS = {
+  groq: "Groq",
+  google: "Google AI",
+  openrouter: "OpenRouter"
+};
+
+const MODEL_REGISTRY = {
+  groq: [
+    { id: "groq/compound", name: "Groq Compound", vision: false, reasoning: true, tools: true, purpose: "chat, busqueda, codigo, tareas generales" },
+    { id: "groq/compound-mini", name: "Groq Compound Mini", vision: false, reasoning: true, tools: true, purpose: "chat rapido, busqueda, tareas cortas" },
+    { id: "openai/gpt-oss-120b", name: "GPT OSS 120B", vision: false, reasoning: true, purpose: "razonamiento, matematica, codigo, chat avanzado" },
+    { id: "openai/gpt-oss-20b", name: "GPT OSS 20B", vision: false, reasoning: true, purpose: "chat rapido, matematica ligera, codigo" },
+    { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B", vision: false, purpose: "chat, redaccion, ingles, resumen" },
+    { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant", vision: false, purpose: "chat rapido, tareas simples, bajo costo" },
+    { id: "deepseek-r1-distill-llama-70b", name: "DeepSeek R1 Distill 70B", vision: false, reasoning: true, purpose: "matematica, logica, razonamiento" },
+    { id: "deepseek-r1-distill-qwen-32b", name: "DeepSeek R1 Distill Qwen 32B", vision: false, reasoning: true, purpose: "matematica, logica, explicaciones paso a paso" },
+    { id: "qwen/qwen3-32b", name: "Qwen3 32B", vision: false, reasoning: true, purpose: "matematica, codigo, multilingue" },
+    { id: "meta-llama/llama-4-scout-17b-16e-instruct", name: "Llama 4 Scout Vision", vision: true, purpose: "imagenes, OCR, tareas visuales, chat" },
+    { id: "whisper-large-v3", name: "Whisper Large V3", vision: false, audio: true, text: false, purpose: "audio, transcripcion" },
+    { id: "whisper-large-v3-turbo", name: "Whisper Large V3 Turbo", vision: false, audio: true, text: false, purpose: "audio rapido, transcripcion" }
+  ],
+  google: [
+    { id: "gemini-3-pro-preview", name: "Gemini 3 Pro Preview", vision: true, reasoning: true, purpose: "razonamiento, imagenes, codigo, tareas dificiles" },
+    { id: "gemini-3-flash-preview", name: "Gemini 3 Flash Preview", vision: true, reasoning: true, purpose: "imagenes, chat, velocidad, tareas escolares" },
+    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", vision: true, reasoning: true, purpose: "matematica, codigo, texto largo, analisis" },
+    { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", vision: true, reasoning: true, purpose: "imagenes, chat, tareas escolares, ingles" },
+    { id: "gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite", vision: true, purpose: "chat rapido, resumen, bajo costo" },
+    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", vision: true, purpose: "imagenes, OCR, chat rapido" },
+    { id: "gemini-flash-latest", name: "Gemini Flash Latest", vision: true, purpose: "chat, imagenes, modelo actualizado" },
+    { id: "gemini-pro-latest", name: "Gemini Pro Latest", vision: true, reasoning: true, purpose: "razonamiento, codigo, lectura dificil" },
+    { id: "gemini-embedding-001", name: "Gemini Embedding", vision: false, text: false, embedding: true, purpose: "embeddings, busqueda semantica" }
+  ],
+  openrouter: [
+    { id: "deepseek/deepseek-r1:free", name: "DeepSeek R1 Free", vision: false, reasoning: true, purpose: "matematica, logica, gratis" },
+    { id: "deepseek/deepseek-chat:free", name: "DeepSeek Chat Free", vision: false, purpose: "chat, codigo, gratis" },
+    { id: "deepseek/deepseek-r1-zero:free", name: "DeepSeek R1 Zero Free", vision: false, reasoning: true, purpose: "matematica, logica avanzada, gratis" },
+    { id: "qwen/qwq-32b:free", name: "QwQ 32B Free", vision: false, reasoning: true, purpose: "matematica, razonamiento, gratis" },
+    { id: "qwen/qwen-2.5-coder-32b-instruct:free", name: "Qwen Coder 32B Free", vision: false, purpose: "codigo, depuracion, gratis" },
+    { id: "qwen/qwen-2.5-72b-instruct:free", name: "Qwen 2.5 72B Free", vision: false, purpose: "chat, ingles, tareas escolares, gratis" },
+    { id: "mistralai/mistral-small-3.1-24b-instruct:free", name: "Mistral Small 3.1 Free", vision: true, purpose: "imagenes, multilingue, chat, gratis" },
+    { id: "meta-llama/llama-3.3-70b-instruct:free", name: "Llama 3.3 70B Free", vision: false, purpose: "chat, resumen, ingles, gratis" },
+    { id: "meta-llama/llama-4-scout:free", name: "Llama 4 Scout Free", vision: true, purpose: "imagenes, chat, gratis" },
+    { id: "google/gemini-2.0-flash-exp:free", name: "Gemini 2.0 Flash Free", vision: true, purpose: "imagenes, chat, tareas escolares, gratis" },
+    { id: "google/gemini-flash-1.5-8b:free", name: "Gemini Flash 1.5 8B Free", vision: true, purpose: "imagenes, chat rapido, gratis" },
+    { id: "google/gemma-3-27b-it:free", name: "Gemma 3 27B Free", vision: true, purpose: "imagenes, chat, tareas escolares, gratis" },
+    { id: "google/gemma-3-12b-it:free", name: "Gemma 3 12B Free", vision: true, purpose: "imagenes, chat, gratis" },
+    { id: "google/gemma-3-4b-it:free", name: "Gemma 3 4B Free", vision: true, purpose: "imagenes, rapido, gratis" },
+    { id: "microsoft/phi-4:free", name: "Phi 4 Free", vision: false, purpose: "matematica ligera, chat, gratis" }
+  ]
+};
+
+const PRESETS = {
+  tutor: "Eres un tutor paciente y didactico. Explica con pasos claros, ejemplos cortos y confirma la respuesta final.",
+  codigo: "Eres un programador senior. Da soluciones limpias, explica los errores y muestra codigo cuando ayude.",
+  resumen: "Eres un asistente de estudio. Resume, ordena ideas y convierte textos largos en apuntes claros.",
+  vision: "Eres un analista visual. Describe imagenes con precision, lee texto visible y responde segun la imagen."
+};
+
+const state = {
+  keys: { groq: ["", "", ""], google: ["", "", ""], openrouter: ["", "", ""] },
+  filters: { chat: "auto", bee: "auto" },
+  reqCount: Number(localStorage.getItem("tml_req_count") || "0"),
+  chatMessages: JSON.parse(localStorage.getItem("tml_chat_messages") || "[]"),
+  pendingImages: [],
+  beeMode: "fast",
+  beeAnswers: JSON.parse(localStorage.getItem("tml_bee_current") || "[]"),
+  beeHistory: JSON.parse(localStorage.getItem("tml_bee_history") || "[]"),
+  lastBeeAnswer: ""
+};
+
+document.addEventListener("DOMContentLoaded", init);
+
+function init() {
+  loadKeys();
+  loadSavedApiModels();
+  bindUI();
+  renderKeys();
+  renderModels("chat");
+  renderModels("bee");
+  renderStatus();
+  renderChatMessages();
+  renderChatStats();
+  renderBeeStats();
+  renderBeeTracker();
+  renderBeeHistory();
+  document.getElementById("requestCount").textContent = state.reqCount;
+}
+
+function bindUI() {
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.addEventListener("click", () => switchView(button.dataset.view));
+  });
+
+  document.getElementById("toggleConfig").addEventListener("click", () => {
+    document.getElementById("configPanel").classList.toggle("open");
+  });
+
+  document.getElementById("clearKeysBtn").addEventListener("click", clearAllKeys);
+  document.getElementById("exportKeysBtn").addEventListener("click", exportKeys);
+  document.getElementById("importKeysBtn").addEventListener("click", () => document.getElementById("importKeysInput").click());
+  document.getElementById("importKeysInput").addEventListener("change", importKeys);
+
+  document.querySelectorAll(".chips").forEach((group) => {
+    group.addEventListener("click", (event) => {
+      const button = event.target.closest(".chip");
+      if (!button) return;
+      setFilter(group.dataset.owner, button.dataset.filter);
+    });
+  });
+
+  document.getElementById("chatModel").addEventListener("change", () => saveSelectedModel("chat"));
+  document.getElementById("beeModel").addEventListener("change", () => saveSelectedModel("bee"));
+  document.getElementById("refreshModelsChat").addEventListener("click", refreshAllModels);
+  document.getElementById("refreshModelsBee").addEventListener("click", refreshAllModels);
+  document.getElementById("chatCustomModel").addEventListener("input", () => {
+    localStorage.setItem("tml_custom_chat", document.getElementById("chatCustomModel").value.trim());
+    updateModelInfo("chat");
+  });
+  document.getElementById("beeCustomModel").addEventListener("input", () => {
+    localStorage.setItem("tml_custom_bee", document.getElementById("beeCustomModel").value.trim());
+    updateModelInfo("bee");
+  });
+  document.getElementById("chatCustomModel").value = localStorage.getItem("tml_custom_chat") || "";
+  document.getElementById("beeCustomModel").value = localStorage.getItem("tml_custom_bee") || "";
+
+  const chatInput = document.getElementById("chatInput");
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendChat();
+    }
+  });
+  chatInput.addEventListener("input", () => autoResize(chatInput));
+
+  document.getElementById("sendChatBtn").addEventListener("click", sendChat);
+  document.getElementById("clearChatBtn").addEventListener("click", clearChat);
+  document.getElementById("exportChatBtn").addEventListener("click", exportChat);
+  document.getElementById("imageInput").addEventListener("change", (event) => attachImages(event.target.files));
+  document.getElementById("resetSystemBtn").addEventListener("click", resetSystemPrompt);
+
+  document.querySelectorAll(".preset-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.getElementById("systemPrompt").value = PRESETS[button.dataset.preset] || PRESETS.tutor;
+    });
+  });
+
+  const dropZone = document.getElementById("chatDropZone");
+  dropZone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+  dropZone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    dropZone.classList.remove("dragover");
+    attachImages(event.dataTransfer.files);
+  });
+  document.addEventListener("paste", handlePaste);
+
+  document.getElementById("beeText").addEventListener("input", renderBeeStats);
+  document.querySelectorAll(".mode-btn").forEach((button) => {
+    button.addEventListener("click", () => setBeeMode(button.dataset.mode));
+  });
+  document.getElementById("submitBeeBtn").addEventListener("click", submitBee);
+  document.getElementById("saveBeeBtn").addEventListener("click", saveBeeChallenge);
+  document.getElementById("resetBeeBtn").addEventListener("click", resetBeeChallenge);
+  document.getElementById("copyBeeBtn").addEventListener("click", copyBeeAnswer);
+  document.getElementById("clearBeeTextBtn").addEventListener("click", () => {
+    document.getElementById("beeText").value = "";
+    renderBeeStats();
+  });
+  document.getElementById("clearBeeHistoryBtn").addEventListener("click", clearBeeHistory);
+}
+
+function switchView(view) {
+  document.querySelectorAll(".view").forEach((element) => {
+    element.classList.toggle("active", element.id === `view-${view}`);
+  });
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+}
+
+function loadKeys() {
+  PROVIDERS.forEach((provider) => {
+    for (let index = 0; index < 3; index++) {
+      const current = localStorage.getItem(`tml_key_${provider}_${index}`);
+      const legacy = localStorage.getItem(`tm_key_${provider}_${index}`);
+      state.keys[provider][index] = current !== null ? current : (legacy || "");
+    }
+  });
+}
+
+function renderKeys() {
+  const grid = document.getElementById("keyGrid");
+  const placeholders = {
+    groq: "gsk_...",
+    google: "AIza...",
+    openrouter: "sk-or-v1-..."
+  };
+
+  grid.innerHTML = PROVIDERS.map((provider) => `
+    <article class="key-card">
+      <div class="key-title">
+        <span class="mini-dot" id="provider-mini-${provider}"></span>
+        ${PROVIDER_LABELS[provider]}
+      </div>
+      ${[0, 1, 2].map((index) => `
+        <div class="key-row">
+          <input class="key-input" id="key-${provider}-${index}" type="password"
+            placeholder="${placeholders[provider]} key ${index + 1}"
+            value="${escapeAttr(state.keys[provider][index])}" />
+          <button class="ghost-btn compact" data-verify="${provider}:${index}" type="button">Test</button>
+          <span class="mini-dot" id="key-dot-${provider}-${index}"></span>
+        </div>
+      `).join("")}
+    </article>
+  `).join("");
+
+  PROVIDERS.forEach((provider) => {
+    for (let index = 0; index < 3; index++) {
+      document.getElementById(`key-${provider}-${index}`).addEventListener("input", (event) => {
+        saveKey(provider, index, event.target.value);
+      });
+    }
+  });
+
+  document.querySelectorAll("[data-verify]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const [provider, index] = button.dataset.verify.split(":");
+      verifyKey(provider, Number(index));
+    });
+  });
+
+  renderStatus();
+}
+
+function saveKey(provider, index, value) {
+  state.keys[provider][index] = value.trim();
+  localStorage.setItem(`tml_key_${provider}_${index}`, state.keys[provider][index]);
+  renderStatus();
+}
+
+function activeKeys(provider) {
+  return state.keys[provider].filter((key) => key.trim().length > 8);
+}
+
+function renderStatus() {
+  PROVIDERS.forEach((provider) => {
+    const count = activeKeys(provider).length;
+    const status = count === 0 ? "err" : count === 3 ? "ok" : "partial";
+    document.getElementById(`count-${provider}`).textContent = `${count}/3`;
+    document.getElementById(`dot-${provider}`).className = `status-dot ${status}`;
+    const providerMini = document.getElementById(`provider-mini-${provider}`);
+    if (providerMini) providerMini.className = `mini-dot ${count ? "ok" : ""}`;
+
+    for (let index = 0; index < 3; index++) {
+      const dot = document.getElementById(`key-dot-${provider}-${index}`);
+      if (dot) dot.className = `mini-dot ${state.keys[provider][index] ? "ok" : ""}`;
+    }
+  });
+}
+
+async function verifyKey(provider, index) {
+  const key = state.keys[provider][index];
+  const dot = document.getElementById(`key-dot-${provider}-${index}`);
+  if (!key) return;
+  dot.className = "mini-dot";
+
+  try {
+    let response;
+    if (provider === "groq") {
+      response = await fetch("https://api.groq.com/openai/v1/models", {
+        headers: { Authorization: `Bearer ${key}` }
+      });
+    } else if (provider === "google") {
+      response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+        headers: { "x-goog-api-key": key }
+      });
+    } else {
+      response = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: { Authorization: `Bearer ${key}` }
+      });
+    }
+    dot.className = `mini-dot ${response.ok ? "ok" : "err"}`;
+  } catch {
+    dot.className = "mini-dot err";
+  }
+}
+
+function clearAllKeys() {
+  PROVIDERS.forEach((provider) => {
+    for (let index = 0; index < 3; index++) {
+      state.keys[provider][index] = "";
+      localStorage.removeItem(`tml_key_${provider}_${index}`);
+      localStorage.removeItem(`tm_key_${provider}_${index}`);
+    }
+  });
+  renderKeys();
+}
+
+function exportKeys() {
+  const payload = JSON.stringify({ keys: state.keys }, null, 2);
+  downloadText("textmind-keys.json", payload);
+}
+
+function importKeys(event) {
+  const file = event.target.files[0];
+  event.target.value = "";
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const keys = parsed.keys || parsed;
+      PROVIDERS.forEach((provider) => {
+        if (!Array.isArray(keys[provider])) return;
+        for (let index = 0; index < 3; index++) {
+          state.keys[provider][index] = String(keys[provider][index] || "").trim();
+          localStorage.setItem(`tml_key_${provider}_${index}`, state.keys[provider][index]);
+        }
+      });
+      renderKeys();
+      toast("Keys importadas.");
+    } catch {
+      toast("JSON invalido.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function setFilter(owner, filter) {
+  state.filters[owner] = filter;
+  document.querySelectorAll(`.chips[data-owner="${owner}"] .chip`).forEach((button) => {
+    button.classList.toggle("active", button.dataset.filter === filter);
+  });
+  renderModels(owner);
+}
+
+function loadSavedApiModels() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("tml_api_models") || "{}");
+    PROVIDERS.forEach((provider) => mergeProviderModels(provider, saved[provider] || []));
+  } catch {
+    localStorage.removeItem("tml_api_models");
+  }
+}
+
+function saveApiModels() {
+  const apiModels = {};
+  PROVIDERS.forEach((provider) => {
+    apiModels[provider] = MODEL_REGISTRY[provider].filter((model) => model.fromApi && isFreeModel(model));
+  });
+  localStorage.setItem("tml_api_models", JSON.stringify(apiModels));
+}
+
+function mergeProviderModels(provider, incoming) {
+  const byId = new Map((MODEL_REGISTRY[provider] || []).map((model) => [model.id, model]));
+  incoming.forEach((model) => {
+    if (!model?.id) return;
+    const normalized = normalizeModel(provider, model);
+    byId.set(normalized.id, { ...(byId.get(normalized.id) || {}), ...normalized });
+  });
+  MODEL_REGISTRY[provider] = Array.from(byId.values()).sort(compareModels);
+}
+
+function compareModels(a, b) {
+  const score = (model) => (model.text === false ? 8 : 0) + (model.fromApi ? 2 : 0) - (model.vision ? 1 : 0) - (model.reasoning ? 1 : 0);
+  return score(a) - score(b) || a.name.localeCompare(b.name);
+}
+
+function getModelList(filter) {
+  const list = [];
+  Object.entries(MODEL_REGISTRY).forEach(([provider, models]) => {
+    models.forEach((model) => {
+      if (!isFreeModel({ ...model, provider })) return;
+      if (model.text === false) return;
+      if (filter === "auto" || filter === provider || (filter === "vision" && model.vision)) {
+        list.push({ ...model, provider });
+      }
+    });
+  });
+  return list;
+}
+
+function renderModels(owner) {
+  const select = document.getElementById(owner === "chat" ? "chatModel" : "beeModel");
+  const saved = localStorage.getItem(`tml_model_${owner}`) || "";
+  const grouped = getModelList(state.filters[owner]).reduce((acc, model) => {
+    acc[model.provider] ||= [];
+    acc[model.provider].push(model);
+    return acc;
+  }, {});
+
+  select.innerHTML = Object.entries(grouped).map(([provider, models]) => `
+    <optgroup label="${PROVIDER_LABELS[provider]}">
+      ${models.map((model) => {
+        const value = `${model.provider}|||${model.id}`;
+        const disabled = model.text === false ? "disabled" : "";
+        return `<option value="${escapeAttr(value)}" ${value === saved ? "selected" : ""} ${disabled}>${escapeHTML(modelOptionLabel(model))}</option>`;
+      }).join("")}
+    </optgroup>
+  `).join("");
+
+  if (!select.value && select.options.length) select.selectedIndex = 0;
+  saveSelectedModel(owner);
+  updateModelInfo(owner);
+}
+
+function saveSelectedModel(owner) {
+  const select = document.getElementById(owner === "chat" ? "chatModel" : "beeModel");
+  localStorage.setItem(`tml_model_${owner}`, select.value);
+  updateModelInfo(owner);
+}
+
+function selectedModel(owner) {
+  const select = document.getElementById(owner === "chat" ? "chatModel" : "beeModel");
+  const customInput = document.getElementById(owner === "chat" ? "chatCustomModel" : "beeCustomModel");
+  if (!select.value) return null;
+
+  const [provider, id] = select.value.split("|||");
+  const model = MODEL_REGISTRY[provider]?.find((item) => item.id === id);
+  const customId = customInput.value.trim();
+  return {
+    ...(model || { id, name: id, vision: false, purpose: inferModelPurpose({ id, name: id, provider }) }),
+    id: customId || id,
+    name: customId ? `Custom ${customId}` : (model?.name || id),
+    purpose: customId ? "modelo personalizado, segun proveedor" : (model?.purpose || inferModelPurpose({ ...(model || {}), id, provider })),
+    provider
+  };
+}
+
+function updateModelInfo(owner) {
+  const model = selectedModel(owner);
+  const info = document.getElementById(owner === "chat" ? "chatModelInfo" : "beeModelInfo");
+  if (!info || !model) return;
+  const tags = modelTags(model).join(", ");
+  const source = model.fromApi ? "API actualizada" : "lista base";
+  info.textContent = `${PROVIDER_LABELS[model.provider]}: ${model.name} (${model.purpose || tags}). ID: ${model.id}. Gratis: si. Fuente: ${source}.`;
+}
+
+function candidateModels(owner, needsVision) {
+  const selected = selectedModel(owner);
+  const seen = new Set();
+  const candidates = [];
+
+  const add = (model) => {
+    if (!model || activeKeys(model.provider).length === 0) return;
+    if (model.text === false) return;
+    if (!isFreeModel(model)) return;
+    if (needsVision && !model.vision) return;
+    const key = `${model.provider}|||${model.id}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    candidates.push(model);
+  };
+
+  add(selected);
+  if (selected) {
+    MODEL_REGISTRY[selected.provider].forEach((model) => add({ ...model, provider: selected.provider }));
+  }
+  PROVIDERS.forEach((provider) => {
+    MODEL_REGISTRY[provider].forEach((model) => add({ ...model, provider }));
+  });
+
+  return candidates;
+}
+
+function normalizeModel(provider, model) {
+  const id = String(model.id || "").replace(/^models\//, "");
+  const name = model.name && !String(model.name).startsWith("models/")
+    ? String(model.name)
+    : titleFromModelId(id);
+  const inputModalities = model.inputModalities || model.architecture?.input_modalities || [];
+  const outputModalities = model.outputModalities || model.architecture?.output_modalities || ["text"];
+  const supported = model.supported_parameters || model.supportedGenerationMethods || [];
+  const text = model.text ?? (outputModalities.includes("text") || supported.includes("generateContent") || provider !== "openrouter");
+  const normalized = {
+    id,
+    name,
+    provider,
+    vision: Boolean(model.vision || inputModalities.includes("image") || /vision|vl|gpt-4o|gemini|llama-4|gemma-3/i.test(`${id} ${name}`)),
+    reasoning: Boolean(model.reasoning || supported.includes("reasoning") || supported.includes("include_reasoning") || /reason|thinking|r1|qwq|o3|gpt-oss|qwen3|pro/i.test(`${id} ${name}`)),
+    audio: Boolean(model.audio || inputModalities.includes("audio") || outputModalities.includes("audio") || /whisper|audio|tts/i.test(`${id} ${name}`)),
+    embedding: Boolean(model.embedding || outputModalities.includes("embeddings") || /embedding|embed/i.test(`${id} ${name}`)),
+    imageOutput: Boolean(model.imageOutput || outputModalities.includes("image") || /image|imagen|dall|flux|stable-diffusion/i.test(`${id} ${name}`)),
+    text,
+    context: model.context || model.context_length || model.top_provider?.context_length || null,
+    pricing: model.pricing || null,
+    free: model.free,
+    fromApi: Boolean(model.fromApi)
+  };
+  normalized.purpose = model.purpose || inferModelPurpose(normalized);
+  normalized.free = isFreeModel(normalized);
+  return normalized;
+}
+
+function modelOptionLabel(model) {
+  const disabled = model.text === false ? " - no chat" : "";
+  const purpose = model.purpose || modelTags(model).join(", ");
+  return `${model.name} (${purpose}, gratis)${disabled}`;
+}
+
+function modelTags(model) {
+  const id = `${model.id || ""} ${model.name || ""}`.toLowerCase();
+  const tags = [];
+  if (model.vision || /vision|vl|gpt-4o|gemini|gemma-3|llama-4/.test(id)) tags.push("imagenes");
+  if (model.imageOutput || /image|imagen|flux|dall|stable-diffusion/.test(id)) tags.push("generar imagenes");
+  if (model.reasoning || /r1|reason|thinking|qwq|o3|gpt-oss|qwen3|pro/.test(id)) tags.push("matematica");
+  if (/coder|code|codestral|devstral|program|qwen-.*coder/.test(id)) tags.push("codigo");
+  if (/claude|gpt|gemini|llama|mistral|qwen|deepseek|command/.test(id)) tags.push("chat");
+  if (/claude|gpt|gemini|llama|mistral|qwen|command/.test(id)) tags.push("ingles");
+  if (/flash|mini|lite|instant|small|8b|20b/.test(id)) tags.push("rapido");
+  if (/70b|72b|120b|405b|large|pro|sonnet|opus/.test(id)) tags.push("tareas dificiles");
+  if (model.context && model.context >= 100000) tags.push("texto largo");
+  if (model.audio || /whisper|audio|tts/.test(id)) tags.push("audio");
+  if (model.embedding || /embedding|embed/.test(id)) tags.push("embeddings");
+  if (!tags.length) tags.push("chat");
+  return [...new Set(tags)].slice(0, 5);
+}
+
+function isFreeModel(model) {
+  const provider = model.provider;
+  const id = String(model.id || "").toLowerCase();
+  if (model.free === true) return true;
+  if (model.free === false) return false;
+  if (provider === "openrouter") {
+    if (id.endsWith(":free")) return true;
+    if (id === "openrouter/auto") return false;
+    return openRouterPricingIsFree(model.pricing);
+  }
+  return provider === "groq" || provider === "google";
+}
+
+function openRouterPricingIsFree(pricing) {
+  if (!pricing) return false;
+  const keys = ["prompt", "completion", "request", "image", "web_search", "internal_reasoning", "input_cache_read", "input_cache_write"];
+  return keys.every((key) => {
+    const value = pricing[key];
+    return value === undefined || value === null || Number(value) === 0;
+  });
+}
+
+function inferModelPurpose(model) {
+  return modelTags(model).join(", ");
+}
+
+function titleFromModelId(id) {
+  return String(id)
+    .split("/")
+    .pop()
+    .replace(/:free$/i, " free")
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+async function refreshAllModels() {
+  const buttons = [document.getElementById("refreshModelsChat"), document.getElementById("refreshModelsBee")];
+  buttons.forEach((button) => {
+    button.disabled = true;
+    button.textContent = "Actualizando...";
+  });
+
+  const results = [];
+  for (const provider of PROVIDERS) {
+    try {
+      const models = await fetchProviderModels(provider);
+      mergeProviderModels(provider, models);
+      results.push(`${PROVIDER_LABELS[provider]}: ${models.length}`);
+    } catch (error) {
+      results.push(`${PROVIDER_LABELS[provider]}: ${error.message}`);
+    }
+  }
+
+  saveApiModels();
+  renderModels("chat");
+  renderModels("bee");
+  toast(`Modelos: ${results.join(" | ")}`);
+  buttons.forEach((button) => {
+    button.disabled = false;
+    button.textContent = "Actualizar gratis";
+  });
+}
+
+async function fetchProviderModels(provider) {
+  if (provider === "openrouter") return fetchOpenRouterModels();
+  if (provider === "groq") return fetchGroqModels();
+  if (provider === "google") return fetchGoogleModels();
+  return [];
+}
+
+async function fetchOpenRouterModels() {
+  const response = await fetch("https://openrouter.ai/api/v1/models?output_modalities=all");
+  const data = await safeJson(response);
+  if (!response.ok) throw new Error(data.error?.message || `error ${response.status}`);
+  return (data.data || []).map((model) => normalizeModel("openrouter", {
+    id: model.id,
+    name: model.name,
+    architecture: model.architecture,
+    supported_parameters: model.supported_parameters,
+    pricing: model.pricing,
+    context_length: model.context_length,
+    top_provider: model.top_provider,
+    fromApi: true
+  })).filter(isFreeModel);
+}
+
+async function fetchGroqModels() {
+  const key = activeKeys("groq")[0];
+  if (!key) throw new Error("sin key");
+  const response = await fetch("https://api.groq.com/openai/v1/models", {
+    headers: { Authorization: `Bearer ${key}` }
+  });
+  const data = await safeJson(response);
+  if (!response.ok) throw new Error(data.error?.message || `error ${response.status}`);
+  return (data.data || []).map((model) => normalizeModel("groq", {
+    id: model.id,
+    name: titleFromModelId(model.id),
+    free: true,
+    fromApi: true
+  })).filter(isFreeModel);
+}
+
+async function fetchGoogleModels() {
+  const key = activeKeys("google")[0];
+  if (!key) throw new Error("sin key");
+  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+    headers: { "x-goog-api-key": key }
+  });
+  const data = await safeJson(response);
+  if (!response.ok) throw new Error(data.error?.message || `error ${response.status}`);
+  return (data.models || []).map((model) => normalizeModel("google", {
+    id: String(model.name || "").replace(/^models\//, ""),
+    name: model.displayName || titleFromModelId(model.name || ""),
+    supportedGenerationMethods: model.supportedGenerationMethods || [],
+    free: true,
+    fromApi: true
+  })).filter(isFreeModel);
+}
+
+function normalizeMessages(messages) {
+  return messages.map((message) => {
+    if (!Array.isArray(message.content)) return message;
+    const text = message.content.filter((part) => part.type === "text");
+    const images = message.content.filter((part) => part.type === "image_url");
+    return { ...message, content: [...text, ...images] };
+  });
+}
+
+function messagesNeedVision(messages) {
+  return messages.some((message) => Array.isArray(message.content) && message.content.some((part) => part.type === "image_url"));
+}
+
+async function callAI(owner, messages, options = {}) {
+  const normalized = normalizeMessages(messages);
+  const needsVision = Boolean(options.needsVision || messagesNeedVision(normalized));
+  const candidates = candidateModels(owner, needsVision);
+
+  if (!candidates.length) {
+    throw new Error(needsVision
+      ? "Agrega una API key y usa un modelo con vision."
+      : "Agrega al menos una API key.");
+  }
+
+  let lastError;
+  for (const model of candidates) {
+    for (const key of activeKeys(model.provider)) {
+      try {
+        const text = await callProvider(model.provider, key, model.id, normalized);
+        state.reqCount += 1;
+        localStorage.setItem("tml_req_count", String(state.reqCount));
+        document.getElementById("requestCount").textContent = state.reqCount;
+        return { text, model };
+      } catch (error) {
+        lastError = error;
+        console.warn(`${model.provider}/${model.id}:`, error.message);
+      }
+    }
+  }
+
+  throw lastError || new Error("Todas las API keys fallaron.");
+}
+
+async function callProvider(provider, key, model, messages) {
+  if (provider === "google") return callGemini(key, model, messages);
+  if (provider === "groq") {
+    return callOpenAICompatible("https://api.groq.com/openai/v1/chat/completions", key, model, messages, true);
+  }
+  if (provider === "openrouter") {
+    return callOpenAICompatible("https://openrouter.ai/api/v1/chat/completions", key, model, messages, false);
+  }
+  throw new Error(`Proveedor desconocido: ${provider}`);
+}
+
+async function callOpenAICompatible(url, key, model, messages, groq) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${key}`
+  };
+
+  if (!groq) {
+    headers["HTTP-Referer"] = location.href;
+    headers["X-Title"] = "TextMind Lite";
+  }
+
+  const body = {
+    model,
+    messages,
+    temperature: 0.45,
+    ...(groq ? { max_completion_tokens: 2200 } : { max_tokens: 2200 })
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  });
+  const data = await safeJson(response);
+  if (!response.ok) throw new Error(data.error?.message || `Error ${response.status}`);
+  return data.choices?.[0]?.message?.content?.trim() || "";
+}
+
+async function callGemini(key, model, messages) {
+  const systemText = messages
+    .filter((message) => message.role === "system")
+    .map((message) => typeof message.content === "string" ? message.content : "")
+    .filter(Boolean)
+    .join("\n\n");
+
+  const contents = messages
+    .filter((message) => message.role !== "system")
+    .map((message) => ({
+      role: message.role === "assistant" ? "model" : "user",
+      parts: geminiParts(message.content)
+    }))
+    .filter((item) => item.parts.length > 0);
+
+  const body = {
+    contents,
+    generationConfig: {
+      temperature: 0.45,
+      maxOutputTokens: 2200
+    }
+  };
+  if (systemText) body.system_instruction = { parts: [{ text: systemText }] };
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": key
+    },
+    body: JSON.stringify(body)
+  });
+  const data = await safeJson(response);
+  if (!response.ok) throw new Error(data.error?.message || `Google AI error ${response.status}`);
+  if (data.promptFeedback?.blockReason) throw new Error(`Gemini bloqueo la solicitud: ${data.promptFeedback.blockReason}`);
+
+  const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
+  if (!text) throw new Error("Gemini devolvio una respuesta vacia.");
+  return text;
+}
+
+function geminiParts(content) {
+  if (!Array.isArray(content)) return [{ text: String(content || "") }];
+
+  const parts = [];
+  content.forEach((part) => {
+    if (part.type === "text" && part.text) {
+      parts.push({ text: part.text });
+    }
+
+    if (part.type === "image_url") {
+      const parsed = parseDataUrl(part.image_url?.url || "");
+      if (parsed) {
+        parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.base64 } });
+      }
+    }
+  });
+  return parts;
+}
+
+async function safeJson(response) {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+}
+
+async function attachImages(files) {
+  const list = Array.from(files || []);
+  for (const file of list) {
+    if (!file.type.startsWith("image/")) continue;
+    try {
+      state.pendingImages.push(await prepareImage(file));
+    } catch (error) {
+      toast(error.message);
+    }
+  }
+  document.getElementById("imageInput").value = "";
+  renderImagePreviews();
+  renderChatStats();
+}
+
+function handlePaste(event) {
+  const files = Array.from(event.clipboardData?.files || []).filter((file) => file.type.startsWith("image/"));
+  if (files.length) attachImages(files);
+}
+
+async function prepareImage(file) {
+  const original = await readAsDataURL(file);
+  const image = await loadImage(original);
+  const maxSide = 1600;
+  const shouldCompress = Math.max(image.width, image.height) > maxSide || file.size > 1_400_000 || file.type === "image/svg+xml";
+
+  if (!shouldCompress && ["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    return { name: file.name, dataUrl: original, mime: file.type };
+  }
+
+  const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.width * scale));
+  canvas.height = Math.max(1, Math.round(image.height * scale));
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const dataUrl = await canvasToDataURL(canvas, "image/jpeg", .86);
+  return { name: file.name, dataUrl, mime: "image/jpeg" };
+}
+
+function readAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("No se pudo leer la imagen."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("No se pudo cargar la imagen."));
+    image.src = src;
+  });
+}
+
+function canvasToDataURL(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("No se pudo comprimir la imagen."));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("No se pudo convertir la imagen."));
+      reader.readAsDataURL(blob);
+    }, type, quality);
+  });
+}
+
+function parseDataUrl(dataUrl) {
+  const match = String(dataUrl).match(/^data:([^;]+);base64,(.+)$/);
+  return match ? { mime: match[1], base64: match[2] } : null;
+}
+
+function renderImagePreviews() {
+  const previews = document.getElementById("imagePreviews");
+  previews.innerHTML = state.pendingImages.map((image, index) => `
+    <div class="preview">
+      <img src="${image.dataUrl}" alt="${escapeAttr(image.name)}">
+      <button type="button" data-remove-image="${index}" aria-label="Quitar imagen">x</button>
+    </div>
+  `).join("");
+
+  previews.querySelectorAll("[data-remove-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.pendingImages.splice(Number(button.dataset.removeImage), 1);
+      renderImagePreviews();
+      renderChatStats();
+    });
+  });
+}
+
+async function sendChat() {
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  const images = [...state.pendingImages];
+  if (!text && images.length === 0) return;
+
+  const content = images.length
+    ? [
+        { type: "text", text: text || "Analiza esta imagen y responde en espanol." },
+        ...images.map((image) => ({ type: "image_url", image_url: { url: image.dataUrl } }))
+      ]
+    : text;
+
+  const userMessage = { role: "user", content };
+  state.chatMessages.push(userMessage);
+  saveChat();
+  appendMessage("user", content);
+
+  state.pendingImages = [];
+  renderImagePreviews();
+  renderChatStats();
+  input.value = "";
+  autoResize(input);
+
+  const sendButton = document.getElementById("sendChatBtn");
+  sendButton.disabled = true;
+  sendButton.textContent = "...";
+  const loading = appendLoading();
+
+  try {
+    const result = await callAI("chat", buildChatPayload(), { needsVision: images.length > 0 });
+    loading.remove();
+    const assistantMessage = { role: "assistant", content: result.text };
+    state.chatMessages.push(assistantMessage);
+    saveChat();
+    appendMessage("assistant", result.text, result.model);
+    document.getElementById("statModel").textContent = `${PROVIDER_LABELS[result.model.provider]} / ${result.model.name}`;
+  } catch (error) {
+    loading.querySelector(".bubble").innerHTML = `<div class="error-box">${escapeHTML(error.message)}</div>`;
+  } finally {
+    sendButton.disabled = false;
+    sendButton.textContent = "Enviar";
+    renderChatStats();
+  }
+}
+
+function buildChatPayload() {
+  const system = document.getElementById("systemPrompt").value.trim() || "Eres un asistente util. Responde en espanol.";
+  return [
+    { role: "system", content: system },
+    ...state.chatMessages
+  ];
+}
+
+function renderChatMessages() {
+  const box = document.getElementById("chatMessages");
+  box.innerHTML = "";
+  if (!state.chatMessages.length) {
+    box.innerHTML = '<div class="empty-state"><strong>Nuevo chat</strong><span>Listo.</span></div>';
+    return;
+  }
+  state.chatMessages.forEach((message) => appendMessage(message.role, message.content, null, false));
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendMessage(role, content, model = null, scroll = true) {
+  const box = document.getElementById("chatMessages");
+  const empty = box.querySelector(".empty-state");
+  if (empty) empty.remove();
+
+  const element = document.createElement("div");
+  element.className = `msg ${role === "user" ? "user" : "assistant"}`;
+  element.innerHTML = `
+    <div class="avatar">${role === "user" ? "TU" : "AI"}</div>
+    <div class="bubble">
+      ${renderContent(content)}
+      ${model ? `<div class="meta-line">${PROVIDER_LABELS[model.provider]} / ${escapeHTML(model.name)}</div>` : ""}
+    </div>
+  `;
+  box.appendChild(element);
+  if (scroll) box.scrollTop = box.scrollHeight;
+}
+
+function appendLoading() {
+  const box = document.getElementById("chatMessages");
+  const element = document.createElement("div");
+  element.className = "msg assistant";
+  element.innerHTML = `
+    <div class="avatar">AI</div>
+    <div class="bubble"><div class="loading"><span class="spinner"></span>Pensando...</div></div>
+  `;
+  box.appendChild(element);
+  box.scrollTop = box.scrollHeight;
+  return element;
+}
+
+function renderContent(content) {
+  if (Array.isArray(content)) {
+    return content.map((part) => {
+      if (part.type === "text") return textToHtml(part.text);
+      if (part.type === "image_url") return `<img src="${part.image_url.url}" alt="imagen enviada">`;
+      return "";
+    }).join("");
+  }
+  return textToHtml(content);
+}
+
+function renderChatStats() {
+  document.getElementById("statMessages").textContent = state.chatMessages.length;
+  document.getElementById("statImages").textContent = state.pendingImages.length;
+  document.getElementById("statFallback").textContent = state.filters.chat;
+}
+
+function saveChat() {
+  const trimmed = state.chatMessages.slice(-40);
+  state.chatMessages = trimmed;
+  localStorage.setItem("tml_chat_messages", JSON.stringify(trimmed));
+}
+
+function clearChat() {
+  state.chatMessages = [];
+  state.pendingImages = [];
+  saveChat();
+  renderImagePreviews();
+  renderChatMessages();
+  renderChatStats();
+  document.getElementById("statModel").textContent = "-";
+}
+
+function exportChat() {
+  const payload = state.chatMessages.map((message) => {
+    const role = message.role === "user" ? "Usuario" : "Asistente";
+    const content = Array.isArray(message.content)
+      ? message.content.map((part) => part.type === "text" ? part.text : "[imagen]").join("\n")
+      : message.content;
+    return `${role}:\n${content}`;
+  }).join("\n\n---\n\n");
+  downloadText("textmind-chat.txt", payload || "Chat vacio.");
+}
+
+function resetSystemPrompt() {
+  document.getElementById("systemPrompt").value = "Eres un asistente preciso, util y claro. Responde en espanol.";
+}
+
+function renderBeeStats() {
+  const text = document.getElementById("beeText").value;
+  document.getElementById("beeWords").textContent = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById("beeChars").textContent = text.length;
+}
+
+function setBeeMode(mode) {
+  state.beeMode = mode;
+  document.querySelectorAll(".mode-btn").forEach((button) => {
+    button.classList.toggle("active", button.dataset.mode === mode);
+  });
+}
+
+async function submitBee() {
+  const text = document.getElementById("beeText").value.trim();
+  const question = document.getElementById("beeQuestion").value.trim();
+  if (!text) return showBeeError("Pega el texto primero.");
+  if (!question) return showBeeError("Pega la pregunta con sus opciones.");
+  if (state.beeAnswers.length >= 4) return showBeeError("Ya completaste las 4 preguntas.");
+
+  const button = document.getElementById("submitBeeBtn");
+  button.disabled = true;
+  button.textContent = "...";
+  document.getElementById("copyBeeBtn").hidden = true;
+  document.getElementById("beeAnswer").innerHTML = '<div class="loading"><span class="spinner"></span>Analizando...</div>';
+
+  const fast = state.beeMode === "fast";
+  const messages = [
+    {
+      role: "system",
+      content: fast
+        ? 'Eres experto en comprension lectora. Responde solo con la letra correcta y el texto de la opcion. Ejemplo: "b) La respuesta".'
+        : "Eres experto en comprension lectora. Da la respuesta correcta, justifica con evidencia del texto y descarta brevemente las opciones incorrectas."
+    },
+    { role: "user", content: `TEXTO:\n${text}\n\nPREGUNTA Y OPCIONES:\n${question}` }
+  ];
+
+  try {
+    const result = await callAI("bee", messages);
+    state.lastBeeAnswer = result.text;
+    state.beeAnswers.push({
+      question,
+      answer: result.text,
+      model: `${PROVIDER_LABELS[result.model.provider]} / ${result.model.name}`
+    });
+    localStorage.setItem("tml_bee_current", JSON.stringify(state.beeAnswers));
+    document.getElementById("beeAnswer").innerHTML = textToHtml(result.text);
+    document.getElementById("beeUsedModel").textContent = `${PROVIDER_LABELS[result.model.provider]} / ${result.model.name}`;
+    document.getElementById("copyBeeBtn").hidden = false;
+    if (state.beeAnswers.length < 4) document.getElementById("beeQuestion").value = "";
+    renderBeeTracker();
+  } catch (error) {
+    showBeeError(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Responder";
+  }
+}
+
+function showBeeError(message) {
+  document.getElementById("beeAnswer").innerHTML = `<div class="error-box">${escapeHTML(message)}</div>`;
+}
+
+function renderBeeTracker() {
+  const count = state.beeAnswers.length;
+  document.getElementById("beeDots").innerHTML = [1, 2, 3, 4].map((number) => {
+    const cls = number <= count ? "done" : number === count + 1 ? "current" : "";
+    return `<div class="dot-step ${cls}">${number}</div>`;
+  }).join("");
+  document.getElementById("beeProgress").textContent = `${count}/4`;
+  document.getElementById("beeQuestionTitle").textContent = `Pregunta ${Math.min(count + 1, 4)}`;
+  document.getElementById("saveBeeBtn").hidden = count < 4;
+}
+
+function saveBeeChallenge() {
+  if (!state.beeAnswers.length) return;
+  state.beeHistory.unshift({
+    createdAt: new Date().toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" }),
+    text: document.getElementById("beeText").value.trim().slice(0, 140),
+    answers: state.beeAnswers
+  });
+  state.beeHistory = state.beeHistory.slice(0, 20);
+  localStorage.setItem("tml_bee_history", JSON.stringify(state.beeHistory));
+  renderBeeHistory();
+  resetBeeChallenge();
+}
+
+function resetBeeChallenge() {
+  state.beeAnswers = [];
+  state.lastBeeAnswer = "";
+  localStorage.removeItem("tml_bee_current");
+  document.getElementById("beeQuestion").value = "";
+  document.getElementById("beeAnswer").innerHTML = '<p class="placeholder">La respuesta aparecera aqui...</p>';
+  document.getElementById("copyBeeBtn").hidden = true;
+  document.getElementById("beeUsedModel").textContent = "-";
+  renderBeeTracker();
+}
+
+function renderBeeHistory() {
+  const box = document.getElementById("beeHistory");
+  if (!state.beeHistory.length) {
+    box.innerHTML = '<div class="history-item">Sin desafios guardados</div>';
+    return;
+  }
+
+  box.innerHTML = state.beeHistory.map((item, index) => `
+    <article class="history-item">
+      <strong>Desafio ${state.beeHistory.length - index}</strong>
+      <div class="history-meta">${escapeHTML(item.createdAt)} - ${item.answers.length}/4 preguntas</div>
+      <div class="history-meta">${escapeHTML(item.text || "")}</div>
+    </article>
+  `).join("");
+}
+
+function clearBeeHistory() {
+  state.beeHistory = [];
+  localStorage.removeItem("tml_bee_history");
+  renderBeeHistory();
+}
+
+function copyBeeAnswer() {
+  if (!state.lastBeeAnswer) return;
+  navigator.clipboard.writeText(state.lastBeeAnswer);
+  toast("Respuesta copiada.");
+}
+
+function autoResize(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = `${Math.min(textarea.scrollHeight, 130)}px`;
+}
+
+function toast(message) {
+  const hint = document.getElementById("chatHint");
+  hint.textContent = message;
+  setTimeout(() => {
+    if (hint.textContent === message) hint.textContent = "";
+  }, 2800);
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function textToHtml(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return "";
+  const chunks = raw.split(/```/);
+  return chunks.map((chunk, index) => {
+    if (index % 2 === 1) {
+      return `<pre>${escapeHTML(chunk.replace(/^\w+\n/, ""))}</pre>`;
+    }
+    return chunk
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean)
+      .map((paragraph) => `<p>${escapeHTML(paragraph).replace(/\n/g, "<br>")}</p>`)
+      .join("");
+  }).join("");
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeHTML(value).replaceAll("`", "&#096;");
+}
+
+</script>
+</body>
+</html>
